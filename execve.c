@@ -6,7 +6,7 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/08 03:35:25 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/08 19:10:21 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
 
 	exec.cmd_path = NULL;
 	exec.envp = (char **)envp;
-	exec.argv = ft_split(cmd, ' ');
+	exec.argv = ft_split(cmd, "\t\n\v\f\r ");
 	if (init_pipe(in, &pipefd, out))
 		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	if (!exec.argv)
