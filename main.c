@@ -6,11 +6,11 @@
 /*   By: nlaerema <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 23:14:01 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/08 03:23:19 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/09 00:43:33 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "libft/libft.h"
 
 static int	close_fd(int in, int out, int returnCode)
 {
