@@ -6,7 +6,7 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/08 19:10:21 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/08 19:49:51 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,14 @@ static void	execve_free(t_exec *exec)
 pid_t	execve_error(t_pipe *pipefd, t_exec *exec,
 			char const *cmd, t_execve_error error)
 {
-	ft_close(&pipefd->in[0]);
-	ft_close(&pipefd->in[1]);
-	ft_close(&pipefd->out[0]);
-	ft_close(&pipefd->out[1]);
 	execve_free(exec);
+	if (pipefd)
+	{
+		ft_close(&pipefd->in[0]);
+		ft_close(&pipefd->in[1]);
+		ft_close(&pipefd->out[0]);
+		ft_close(&pipefd->out[1]);
+	}
 	if (error == EXCV_CMD_ERROR)
 		ft_dprintf(STDERR_FILENO, "%s: command not found: %s\n",
 			ft_basename(ft_argv(NULL)[0]), cmd);
@@ -96,14 +99,14 @@ pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
 
 	exec.cmd_path = NULL;
 	exec.envp = (char **)envp;
-	exec.argv = ft_split(cmd, "\t\n\v\f\r ");
-	if (init_pipe(in, &pipefd, out))
-		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
+	exec.argv = ft_split(cmd, "\t ");
 	if (!exec.argv)
-		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
+		return (execve_error(NULL, &exec, cmd, EXCV_OTHER_ERROR));
 	exec.cmd_path = ft_which(exec.argv[0], envp);
 	if (!exec.cmd_path)
-		return (execve_error(&pipefd, &exec, cmd, EXCV_CMD_ERROR));
+		return (execve_error(NULL, &exec, cmd, EXCV_CMD_ERROR));
+	if (init_pipe(in, &pipefd, out))
+		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	pid = fork();
 	if (pid == 0)
 		cmd_execve(&pipefd, &exec, cmd);
