@@ -6,13 +6,11 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/07 02:19:58 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/08 03:35:25 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-int	g_fork = 0;
 
 static void	execve_free(t_exec *exec)
 {
@@ -34,28 +32,19 @@ static void	execve_free(t_exec *exec)
 }
 
 pid_t	execve_error(t_pipe *pipefd, t_exec *exec,
-			char const *cmd, t_pipe_error error)
+			char const *cmd, t_execve_error error)
 {
-	close(pipefd->in[0]);
-	close(pipefd->in[1]);
-	close(pipefd->out[0]);
-	close(pipefd->out[1]);
+	ft_close(&pipefd->in[0]);
+	ft_close(&pipefd->in[1]);
+	ft_close(&pipefd->out[0]);
+	ft_close(&pipefd->out[1]);
 	execve_free(exec);
-	if (error & ALLOC_ERROR)
-		ft_dprintf(STDERR_FILENO, "%d: alloc error\n", g_fork);
-	if (error & PIPE_ERROR)
-		ft_dprintf(STDERR_FILENO, "%d: pipe error\n", g_fork);
-	if (error & CMD_INVALID)
-		ft_dprintf(STDERR_FILENO, "command not found: %s\n", cmd);
-	if (error & DUP_ERROR)
-		ft_dprintf(STDERR_FILENO, "%d: dup error\n", g_fork);
-	if (error & FORK_ERROR)
-		ft_dprintf(STDERR_FILENO, "%d: fork error\n", g_fork);
-	if (error & CLOSE_ERROR)
-		ft_dprintf(STDERR_FILENO, "%d: close error\n", g_fork);
-	if (error & CMD_ERROR)
-		ft_dprintf(STDERR_FILENO, "command not work: %s\n", exec->cmd_path);
-	if (error & IN_FORK)
+	if (error == EXCV_CMD_ERROR)
+		ft_dprintf(STDERR_FILENO, "%s: command not found: %s\n",
+			ft_basename(ft_argv(NULL)[0]), cmd);
+	if (error == EXCV_FORK_ERROR || error == EXCV_OTHER_ERROR)
+		perror(ft_basename(ft_argv(NULL)[0]));
+	if (error == EXCV_FORK_ERROR)
 		exit(1);
 	return (INVALID_PID);
 }
@@ -70,7 +59,7 @@ static int	init_pipe(int *in, t_pipe *pipefd, int *out)
 	else
 	{
 		if (pipe(pipefd->in))
-			return (1);
+			return (EXIT_FAILURE);
 		*in = pipefd->in[1];
 	}
 	if (*out != INVALID_FD)
@@ -81,23 +70,22 @@ static int	init_pipe(int *in, t_pipe *pipefd, int *out)
 	else
 	{
 		if (pipe(pipefd->out))
-			return (1);
+			return (EXIT_FAILURE);
 		*out = pipefd->out[0];
 	}
-	return (0);
+	return (EXIT_SUCCESS);
 }
 
 static void	cmd_execve(t_pipe *pipefd, t_exec *exec, char const *cmd)
 {
-	g_fork++;
 	if (ft_close(&pipefd->in[1]) || ft_close(&pipefd->out[0]))
-		execve_error(pipefd, exec, cmd, CLOSE_ERROR | IN_FORK);
+		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	if (dup2(pipefd->in[0], STDIN_FILENO) == INVALID_FD)
-		execve_error(pipefd, exec, cmd, DUP_ERROR | IN_FORK);
+		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	if (dup2(pipefd->out[1], STDOUT_FILENO) == INVALID_FD)
-		execve_error(pipefd, exec, cmd, DUP_ERROR | IN_FORK);
+		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	execve(exec->cmd_path, exec->argv, exec->envp);
-	execve_error(pipefd, exec, cmd, CMD_ERROR | IN_FORK);
+	execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 }
 
 pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
@@ -109,20 +97,20 @@ pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
 	exec.cmd_path = NULL;
 	exec.envp = (char **)envp;
 	exec.argv = ft_split(cmd, ' ');
+	if (init_pipe(in, &pipefd, out))
+		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	if (!exec.argv)
-		return (execve_error(&pipefd, &exec, cmd, ALLOC_ERROR));
+		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	exec.cmd_path = ft_which(exec.argv[0], envp);
 	if (!exec.cmd_path)
-		return (execve_error(&pipefd, &exec, cmd, CMD_INVALID));
-	if (init_pipe(in, &pipefd, out))
-		return (execve_error(&pipefd, &exec, cmd, PIPE_ERROR));
+		return (execve_error(&pipefd, &exec, cmd, EXCV_CMD_ERROR));
 	pid = fork();
 	if (pid == 0)
 		cmd_execve(&pipefd, &exec, cmd);
 	if (pid == INVALID_PID)
-		return (execve_error(&pipefd, &exec, cmd, FORK_ERROR));
+		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	execve_free(&exec);
 	if (ft_close(&pipefd.in[0]) || ft_close(&pipefd.out[1]))
-		return (execve_error(&pipefd, &exec, cmd, CLOSE_ERROR));
+		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	return (pid);
 }

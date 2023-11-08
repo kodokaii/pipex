@@ -3,8 +3,7 @@ NAME 		= pipex
 CC 			= cc
 RM			= rm -f
 CLONE 		= git clone --depth=1
-
-CFLAGS 		+= -Wall -Werror -O3
+CFLAGS 		+= -Wall -Wextra -Werror
 CLINKS		=
 
 FT			= libft

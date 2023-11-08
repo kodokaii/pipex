@@ -6,7 +6,7 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/07 01:24:29 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/08 03:30:11 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,18 +17,13 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 
-typedef enum e_pipe_error
+typedef enum e_execve_error
 {
-	NO_ERROR		= 0b00000000,
-	ALLOC_ERROR		= 0b00000001,
-	PIPE_ERROR		= 0b00000010,
-	CMD_INVALID		= 0b00000100,
-	DUP_ERROR		= 0b00001000,
-	FORK_ERROR		= 0b00010000,
-	CLOSE_ERROR		= 0b00100000,
-	CMD_ERROR		= 0b01000000,
-	IN_FORK			= 0b10000000
-}	t_pipe_error;
+	EXCV_NO_ERROR,
+	EXCV_CMD_ERROR,
+	EXCV_FORK_ERROR,
+	EXCV_OTHER_ERROR
+}	t_execve_error;
 
 typedef struct s_pipe
 {
@@ -43,10 +38,12 @@ typedef struct s_exec
 	char	**envp;
 }	t_exec;
 
-pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out);
+pid_t		ft_execve(int *in, char const *cmd, char *const *envp, int *out);
 
-int		ft_pipex(int in, char *const *cmd, char *const *envp, int out);
+int			ft_pipex(int in, char *const *cmd, char *const *envp, int out);
 
-char	*ft_which(char const *cmd, char *const *envp);
+int			ft_get_heredoc(char const *limiter);
+
+char		*ft_which(char const *cmd, char *const *envp);
 
 #endif

@@ -6,18 +6,11 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/06 21:13:50 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/07 13:58:39 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-
-static char	*get_path(char *const *envp)
-{
-	while (*envp && ft_strncmp(*envp, "PATH=", 5))
-		envp++;
-	return ((char *)*envp);
-}
 
 static char	*join_cmd_path(const char *cmd, size_t cmd_len, const char **path)
 {
@@ -59,8 +52,8 @@ static char	*find_cmd_path(const char *cmd, const char *path)
 
 char	*ft_which(const char *cmd, char *const *envp)
 {
-	char	*path;
-	char	*cmd_path;
+	char const	*path;
+	char		*cmd_path;
 
 	cmd_path = ft_strdup(cmd);
 	if (!cmd_path)
@@ -71,7 +64,7 @@ char	*ft_which(const char *cmd, char *const *envp)
 		cmd_path = NULL;
 		if (ft_strncmp(cmd, "./", 2))
 		{
-			path = get_path(envp);
+			path = ft_get_envp("PATH=", envp);
 			if (!path)
 				return (NULL);
 			path += 4;
