@@ -6,7 +6,7 @@
 /*   By: kodokai <kodokai.featheur@gmail.com>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 13:43:09 by kodokai           #+#    #+#             */
-/*   Updated: 2023/11/09 00:31:02 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/28 17:14:46 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,18 @@
 
 # define INVALID_PID -1
 # define INVALID_FD -1
+# define INVALID_SIZE -1
+
+# define COLOR_RESET	"\x1B[0m"
+# define COLOR_RED		"\x1B[31m"
+# define COLOR_GREEN	"\x1B[32m"
+# define COLOR_YELLOW	"\x1B[33m"
+# define COLOR_BLUE		"\x1B[34m"
+# define COLOR_MAGENTA	"\x1B[35m"
+# define COLOR_CYAN		"\x1B[36m"
+# define COLOR_WHITE	"\x1B[37m"
+
+# define ERRLOC "Allocation Error"
 
 typedef unsigned char		t_byte;
 typedef unsigned int		t_uint;
@@ -38,15 +50,22 @@ typedef enum e_bool
 
 typedef struct s_buf
 {
-	t_byte	*buf;
-	ssize_t	len;
+	void	*buf;
+	ssize_t	size;
 }	t_buf;
 
 typedef struct s_list
 {
-	void			*content;
+	void			*data;
 	struct s_list	*next;
 }					t_list;
+
+typedef struct s_bst
+{
+	struct s_bst	*left;
+	struct s_bst	*right;
+	void			*data;
+}	t_bst;
 
 t_uint		ft_bytelen(t_byte n, t_byte base);
 t_uint		ft_intlen(int n, int base);
@@ -55,7 +74,7 @@ t_uint		ft_llulen(t_llu n, int base);
 
 int			ft_min_int(int a, int b);
 t_uint		ft_min_uint(t_uint a, t_uint b);
-size_t		ft_min_size_t(size_t a, size_t b);
+size_t		ft_min_size(size_t a, size_t b);
 ssize_t		ft_min_ssize(ssize_t a, ssize_t b);
 double		ft_min_double(double a, double b);
 
@@ -67,7 +86,16 @@ double		ft_max_double(double a, double b);
 
 t_byte		ft_abs_char(t_byte n);
 t_uint		ft_abs_int(t_uint n);
+float		ft_abs_float(float n);
 double		ft_abs_double(double n);
+
+float		ft_expf(float x);
+
+void		ft_swap_int(int *a, int *b);
+t_llu		ft_srand(t_llu init_seed);
+int			ft_rand(void);
+float		ft_randf(void);
+float		ft_randf_norm(void);
 
 t_bool		ft_isalpha(int c);
 t_bool		ft_isdigit(int c);
@@ -79,6 +107,7 @@ t_bool		ft_isspace(int c);
 int			ft_toupper(int c);
 int			ft_tolower(int c);
 
+void		*ft_realloc(void *ptr, size_t oldsize, size_t newsize);
 void		ft_bzero(void *s, size_t n);
 void		*ft_memdup(const void *src, size_t n);
 void		*ft_memset(void *s, int c, size_t n);
@@ -88,6 +117,11 @@ void		*ft_memchr(const void *s, int c, size_t n);
 void		*ft_memchrset(void const *s, void const *set,
 				size_t size_s, size_t size_set);
 int			ft_memcmp(const void *s1, const void *s2, size_t n);
+
+void		*ft_buf_alloc(t_buf *buf, size_t offset, size_t size);
+void		ft_buf_realloc(t_buf *buf, size_t new_size);
+void		ft_buf_free(t_buf *buf);
+void		*ft_buf_write(t_buf *dst, t_buf *src, size_t offset);
 
 size_t		ft_strlen(const char *s);
 size_t		ft_strlcpy(char *dst, const char *src, size_t size);
@@ -102,6 +136,7 @@ char		*ft_strpbrk(const char *s, const char *charset);
 size_t		ft_word_len(char const *str, char const *sep);
 size_t		ft_count_word(char const *str, char const *sep);
 char		**ft_split(char const *s, char *sep);
+void		ft_split_free(char **split);
 
 int			ft_atoi(const char *str);
 double		ft_atof(const char *str);
@@ -131,6 +166,7 @@ void		ft_putllu_base_fd(t_llu n, char *base, int fd);
 int			ft_printf(const char *str, ...);
 int			ft_dprintf(int fd, const char *str, ...);
 
+int			ft_split_argv(int *argc, char ***argv);
 char		**ft_argv(char **init_argv);
 
 char		*ft_basename(char const *s);
@@ -145,14 +181,30 @@ char		*ft_which(char const *cmd, char *const *envp);
 pid_t		ft_execve(int *in, char const *cmd, char *const *envp, int *out);
 int			ft_pipex(int in, char *const *cmd, char *const *envp, int out);
 
-t_list		*ft_lstnew(void *content);
+t_list		*ft_lstnew(void *data);
 void		ft_lstadd_front(t_list **lst, t_list *mew);
-int			ft_lstsize(t_list *lst);
+t_uint		ft_lstsize(t_list *lst);
 t_list		*ft_lstlast(t_list *lst);
+t_list		*ft_lstget(t_list *lst, t_uint index);
+t_list		*ft_lstchr(t_list *root, void *data, int (*cmp)());
+void		ft_lstnext_roll(t_list **current, t_list *root);
+void		ft_putlst_fd(t_list *root, void (*put)(), int fd);
 void		ft_lstadd_back(t_list **lst, t_list *mew);
-void		ft_lstdelone(t_list *lst, void (*del)(void *));
-void		ft_lstclear(t_list **lst, void (*del)(void *));
-void		ft_lstiter(t_list *lst, void (*f)(void *));
-t_list		*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+void		ft_lstdelone(t_list *lst, void (*del)());
+void		ft_lstclear(t_list **lst, void (*del)());
+void		ft_lstiter(t_list *lst, void (*f)());
+t_bool		ft_lstis_sort(t_list *root, int (*cmp)());
+void		ft_lstsort(t_list **root, int (*cmp)());
+void		ft_lstsort_merge(t_list **root, t_list *list, int (*cmp)());
+t_list		*ft_lstmap(t_list *lst, void *(*f)(), void (*del)());
+
+t_bst		*ft_bstnew(void *data);
+t_bst		*ft_bstpush(t_bst **root, void *data, int (*cmp)());
+void		ft_bstclear(t_bst **root, void (*del)());
+void		ft_bstiter_prefix(t_bst *root, void (*f)());
+void		ft_bstiter_suffix(t_bst *root, void (*f)());
+void		ft_bstiter_infix(t_bst *root, void (*f)());
+void		*ft_bstchr(t_bst *root, void *data, int (*cmp)());
+int			ft_bstlevel_count(t_bst *root);
 
 #endif 

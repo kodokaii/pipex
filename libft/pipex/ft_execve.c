@@ -6,13 +6,13 @@
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/09 00:34:51 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/29 02:23:16 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_pipex.h"
 
-static void	execve_free(t_exec *exec)
+static void	_free(t_exec *exec)
 {
 	size_t	i;
 
@@ -31,15 +31,14 @@ static void	execve_free(t_exec *exec)
 	}
 }
 
-pid_t	execve_error(t_pipe *pipefd, t_exec *exec,
+pid_t	_error(t_pipe *pipefd, t_exec *exec,
 			char const *cmd, t_execve_error error)
 {
-	execve_free(exec);
+	if (exec)
+		_free(exec);
 	if (pipefd)
 	{
 		ft_close(&pipefd->in[0]);
-		ft_close(&pipefd->in[1]);
-		ft_close(&pipefd->out[0]);
 		ft_close(&pipefd->out[1]);
 	}
 	if (error == EXCV_CMD_ERROR)
@@ -48,11 +47,11 @@ pid_t	execve_error(t_pipe *pipefd, t_exec *exec,
 	if (error == EXCV_FORK_ERROR || error == EXCV_OTHER_ERROR)
 		perror(ft_basename(ft_argv(NULL)[0]));
 	if (error == EXCV_FORK_ERROR)
-		exit(1);
+		exit(errno);
 	return (INVALID_PID);
 }
 
-static int	init_pipe(int *in, t_pipe *pipefd, int *out)
+static int	_init_pipe(int *in, t_pipe *pipefd, int *out)
 {
 	if (*in != INVALID_FD)
 	{
@@ -79,16 +78,18 @@ static int	init_pipe(int *in, t_pipe *pipefd, int *out)
 	return (EXIT_SUCCESS);
 }
 
-static void	cmd_execve(t_pipe *pipefd, t_exec *exec, char const *cmd)
+static void	_cmd(t_pipe *pipefd, t_exec *exec, char const *cmd)
 {
 	if (ft_close(&pipefd->in[1]) || ft_close(&pipefd->out[0]))
-		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
+		_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	if (dup2(pipefd->in[0], STDIN_FILENO) == INVALID_FD)
-		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
+		_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	if (dup2(pipefd->out[1], STDOUT_FILENO) == INVALID_FD)
-		execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
+		_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
+	if (ft_close(&pipefd->in[0]) || ft_close(&pipefd->out[1]))
+		_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 	execve(exec->cmd_path, exec->argv, exec->envp);
-	execve_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
+	_error(pipefd, exec, cmd, EXCV_FORK_ERROR);
 }
 
 pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
@@ -98,22 +99,23 @@ pid_t	ft_execve(int *in, char const *cmd, char *const *envp, int *out)
 	pid_t	pid;
 
 	exec.cmd_path = NULL;
+	exec.argv = NULL;
 	exec.envp = (char **)envp;
+	if (_init_pipe(in, &pipefd, out))
+		return (_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	exec.argv = ft_split(cmd, "\t ");
 	if (!exec.argv)
-		return (execve_error(NULL, &exec, cmd, EXCV_OTHER_ERROR));
+		return (_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	exec.cmd_path = ft_which(exec.argv[0], envp);
 	if (!exec.cmd_path)
-		return (execve_error(NULL, &exec, cmd, EXCV_CMD_ERROR));
-	if (init_pipe(in, &pipefd, out))
-		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
+		return (_error(&pipefd, &exec, cmd, EXCV_CMD_ERROR));
 	pid = fork();
 	if (pid == 0)
-		cmd_execve(&pipefd, &exec, cmd);
+		_cmd(&pipefd, &exec, cmd);
 	if (pid == INVALID_PID)
-		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
-	execve_free(&exec);
+		return (_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
+	_free(&exec);
 	if (ft_close(&pipefd.in[0]) || ft_close(&pipefd.out[1]))
-		return (execve_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
+		return (_error(&pipefd, &exec, cmd, EXCV_OTHER_ERROR));
 	return (pid);
 }

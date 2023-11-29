@@ -1,34 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_strtoi.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/25 17:46:51 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+int	ft_strtoi(const char *str, char **endptr)
 {
-	int	cmd_out;
-	int	status;
+	long	res;
+	int		sign;
 
-	if (cmd[0])
+	res = 0;
+	while (('\t' <= *str && *str <= '\r') || *str == ' ')
+		str++;
+	sign = 1;
+	if (*str == '+' || *str == '-')
 	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+		if (*str == '-')
+			sign = -1;
+		str++;
 	}
-	return (EXIT_SUCCESS);
+	while (ft_isdigit(*str))
+	{
+		res *= 10;
+		res += *str - '0';
+		if (res * sign < INT_MIN || INT_MAX < res * sign)
+			errno = ERANGE;
+		str++;
+	}
+	if (endptr)
+		*endptr = (char *)str;
+	return (res * sign);
 }

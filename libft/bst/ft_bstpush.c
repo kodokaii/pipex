@@ -1,34 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_bstpush.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Created: 2023/02/08 12:51:22 by nlaerema          #+#    #+#             */
+/*   Updated: 2023/11/25 17:59:10 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+t_bst	*ft_bstpush(t_bst **root, void *data, int (*cmp)())
 {
-	int	cmd_out;
-	int	status;
-
-	if (cmd[0])
-	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
-	}
-	return (EXIT_SUCCESS);
+	if (!*root)
+		return (*root = ft_bstnew(data));
+	if (cmp(data, (*root)->data) <= 0)
+		return (ft_bstpush(&(*root)->left, data, cmp));
+	return (ft_bstpush(&(*root)->right, data, cmp));
 }

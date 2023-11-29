@@ -1,34 +1,67 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_nblen.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/10/22 02:15:16 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+t_uint	ft_bytelen(t_byte n, t_byte base)
 {
-	int	cmd_out;
-	int	status;
+	t_uint	len;
 
-	if (cmd[0])
+	len = 1;
+	while (n / base)
 	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+		n /= base;
+		len++;
 	}
-	return (EXIT_SUCCESS);
+	return (len);
+}
+
+t_uint	ft_intlen(int n, int base)
+{
+	t_uint	len;
+
+	len = 1;
+	if (n < 0)
+		len = 2;
+	while (n / base)
+	{
+		n /= base;
+		len++;
+	}
+	return (len);
+}
+
+t_uint	ft_uintlen(t_uint n, int base)
+{
+	t_uint	len;
+
+	len = 1;
+	while (n / base)
+	{
+		n /= base;
+		len++;
+	}
+	return (len);
+}
+
+t_uint	ft_llulen(t_llu n, int base)
+{
+	t_uint	len;
+
+	len = 1;
+	while (n / base)
+	{
+		n /= base;
+		len++;
+	}
+	return (len);
 }

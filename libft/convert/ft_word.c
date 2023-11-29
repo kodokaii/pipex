@@ -1,34 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_word.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/08 19:04:52 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+size_t	ft_word_len(char const *str, char const *sep)
 {
-	int	cmd_out;
-	int	status;
+	size_t	word_len;
 
-	if (cmd[0])
+	word_len = 0;
+	while (str[word_len] && !ft_strchr(sep, str[word_len]))
+		word_len++;
+	return (word_len);
+}
+
+size_t	ft_count_word(char const *str, char const *sep)
+{
+	size_t	word_count;
+	size_t	word_len;
+
+	word_count = 0;
+	while (*str)
 	{
-		if (cmd[1])
+		word_len = ft_word_len(str, sep);
+		if (word_len)
 		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
+			str += word_len;
+			word_count++;
 		}
 		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+			str++;
 	}
-	return (EXIT_SUCCESS);
+	return (word_count);
 }

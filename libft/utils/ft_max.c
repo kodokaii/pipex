@@ -1,34 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_max.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/10/31 20:14:48 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+int	ft_max_int(int a, int b)
 {
-	int	cmd_out;
-	int	status;
+	if (a < b)
+		return (b);
+	return (a);
+}
 
-	if (cmd[0])
-	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
-	}
-	return (EXIT_SUCCESS);
+t_uint	ft_max_uint(t_uint a, t_uint b)
+{
+	if (a < b)
+		return (b);
+	return (a);
+}
+
+size_t	ft_max_size(size_t a, size_t b)
+{
+	if (a < b)
+		return (b);
+	return (a);
+}
+
+ssize_t	ft_max_ssize(ssize_t a, ssize_t b)
+{
+	if (a < b)
+		return (b);
+	return (a);
+}
+
+double	ft_max_double(double a, double b)
+{
+	if (a < b)
+		return (b);
+	return (a);
 }

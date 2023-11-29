@@ -1,34 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_lstsort.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/23 22:15:21 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+static void	ft_merge_sort(t_list **list, t_uint list_size, int (*cmp)())
 {
-	int	cmd_out;
-	int	status;
+	t_list	*mid;
 
-	if (cmd[0])
+	if (2 <= list_size)
 	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+		mid = ft_lstget(*list, list_size / 2);
+		ft_merge_sort(&mid, (list_size + 1) / 2, cmp);
+		mid->next = NULL;
+		ft_merge_sort(list, list_size / 2, cmp);
+		ft_lstsort_merge(list, mid, cmp);
 	}
-	return (EXIT_SUCCESS);
+}
+
+void	ft_lstsort(t_list **root, int (*cmp)())
+{
+	if (!ft_lstis_sort(*root, cmp))
+		ft_merge_sort(root, ft_lstsize(*root), cmp);
 }

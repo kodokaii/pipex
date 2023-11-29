@@ -1,34 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   random.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/11/13 22:21:27 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+t_llu	ft_srand(t_llu init_seed)
 {
-	int	cmd_out;
-	int	status;
+	static t_llu	seed = (t_llu)ft_srand;
 
-	if (cmd[0])
-	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
-	}
-	return (EXIT_SUCCESS);
+	if (init_seed)
+		seed = init_seed;
+	return (seed);
+}
+
+int	ft_rand(void)
+{
+	t_llu	seed;
+
+	seed = ft_srand(0) * 1103515245 + 12345;
+	ft_srand(seed);
+	return (seed % ((t_uint)INT_MAX + 1));
+}
+
+float	ft_randf(void)
+{
+	return ((float)ft_rand() / (float)INT_MAX);
+}
+
+float	ft_randf_norm(void)
+{
+	float	rnd;
+	t_uint	i;
+
+	i = 0;
+	rnd = 0;
+	while (i++ < 6)
+		rnd += ft_randf();
+	return (rnd / 6);
 }

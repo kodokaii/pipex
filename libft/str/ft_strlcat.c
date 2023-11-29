@@ -1,34 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_strlcat.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/10/16 16:24:37 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
-	int	cmd_out;
-	int	status;
+	size_t	dst_len;
+	size_t	src_len;
 
-	if (cmd[0])
+	dst_len = 0;
+	src_len = 0;
+	while (dst_len < size && dst[dst_len])
+		dst_len++;
+	size -= dst_len;
+	while (src_len + 1 < size && src[src_len])
 	{
-		if (cmd[1])
-		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
-		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+		dst[dst_len + src_len] = src[src_len];
+		src_len++;
 	}
-	return (EXIT_SUCCESS);
+	if (size)
+		dst[dst_len + src_len] = 0;
+	while (src[src_len])
+		src_len++;
+	return (dst_len + src_len);
 }
