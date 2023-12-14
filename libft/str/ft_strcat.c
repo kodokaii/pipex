@@ -1,19 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstrn_fd.c                                    :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/12/07 05:34:37 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/12/13 00:38:56 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-void	ft_putstrn_fd(const char *s, size_t n, int fd)
+char	*ft_strcat(char *dst, char *src)
 {
-	n = ft_min_size(n, ft_strlen(s));
-	write(fd, s, n);
+	size_t	i;
+	size_t	j;
+
+	j = 0;
+	i = ft_strlen(dst);
+	while (src[j])
+		dst[i++] = src[j++];
+	dst[i] = 0;
+	return (dst);
 }

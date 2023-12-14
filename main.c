@@ -6,11 +6,11 @@
 /*   By: nlaerema <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 23:14:01 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 01:42:04 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/12/14 15:44:46 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
+#include "pipex.h"
 
 static int	close_fd(int in, int out, int returnCode)
 {
@@ -80,7 +80,7 @@ int	main(int argc, char *argv[], char *const envp[])
 		if (!strcmp(argv[1], "here_doc"))
 			argv++;
 		argv += 2;
-		if (ft_pipex(infile, argv, envp, outfile))
+		if (ft_pipex(infile, argv, (char **)envp, outfile))
 			return (close_fd(infile, outfile, EXIT_FAILURE));
 		return (close_fd(infile, outfile, EXIT_SUCCESS));
 	}

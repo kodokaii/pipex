@@ -9,7 +9,8 @@ CLINKS		=
 FT			= libft
 LIBFT		= $(FT)/libft.a
 
-SRC 		= main.c
+SRC 		= main.c\
+			  pipex.c
 
 OBJ 		= $(SRC:.c=.o)
 

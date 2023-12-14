@@ -1,34 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.c                                         :+:      :+:    :+:   */
+/*   ft_lstdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/11/29 02:12:07 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/12/02 13:29:30 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_pipex.h"
+#include "../libft.h"
 
-int	ft_pipex(int in, char *const *cmd, char *const *envp, int out)
+int	ft_lstdup(t_list *lst_dst, t_list *lst_src)
 {
-	int	cmd_out;
-	int	status;
+	t_list	**current;
+	t_list	*new;
 
-	if (cmd[0])
+	lst_dst = NULL;
+	current = &lst_dst;
+	while (lst_src)
 	{
-		if (cmd[1])
+		new = ft_lstnew(lst_src->data);
+		if (!new)
 		{
-			cmd_out = INVALID_FD;
-			ft_execve(&in, cmd[0], envp, &cmd_out);
-			ft_pipex(cmd_out, cmd + 1, envp, out);
+			ft_lstclear(&lst_dst, NULL);
+			return (EXIT_FAILURE);
 		}
-		else
-			ft_execve(&in, cmd[0], envp, &out);
-		wait(&status);
-		return (WEXITSTATUS(status));
+		ft_lstadd_front(current, new);
+		current = &(*current)->next;
+		lst_src = lst_src->next;
 	}
 	return (EXIT_SUCCESS);
 }

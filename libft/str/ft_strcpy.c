@@ -1,19 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstrn_fd.c                                    :+:      :+:    :+:   */
+/*   ft_strcpy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nlaerema <nlaerema@student.42lehavre.fr>	+#+  +:+       +#+        */
+/*   By: nlaerema <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/12/07 05:34:37 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/12/10 22:30:43 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../libft.h"
 
-void	ft_putstrn_fd(const char *s, size_t n, int fd)
+char	*ft_strcpy(char *dest, char *src)
 {
-	n = ft_min_size(n, ft_strlen(s));
-	write(fd, s, n);
+	size_t	len;
+
+	len = 0;
+	while (src[len])
+	{
+		dest[len] = src[len];
+		len++;
+	}
+	dest[len] = 0;
+	return (dest);
 }
