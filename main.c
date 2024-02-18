@@ -6,7 +6,7 @@
 /*   By: nlaerema <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/04 23:14:01 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/12/14 15:44:46 by nlaerema         ###   ########.fr       */
+/*   Updated: 2024/02/16 20:39:47 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static int	open_file(int argc, char **argv, int *in, int *out)
 		*in = open(argv[1], O_RDONLY);
 		if (*in == INVALID_FD)
 			return (open_error(argv[1]));
-		*out = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0b110100100);
+		*out = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 		if (*out == INVALID_FD)
 			return (open_error(argv[argc - 1]));
 	}

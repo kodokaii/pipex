@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pipex.h                                         :+:      :+:    :+:   */
+/*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nlaerema <nlaerema@student.42lehavre.fr>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/05 10:58:17 by nlaerema          #+#    #+#             */
-/*   Updated: 2023/12/14 15:42:29 by nlaerema         ###   ########.fr       */
+/*   Updated: 2023/12/14 16:37:18 by nlaerema         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_PIPEX_H
-# define FT_PIPEX_H
+#ifndef PIPEX_H
+# define PIPEX_H
 
 # include "libft/libft.h"
 
